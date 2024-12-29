@@ -10,6 +10,8 @@ services:
       EHRBASE_PASSWORD: ehrbase_restricted
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      # to persist the data
+      - ehrbase_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
   ehrbase:
@@ -20,5 +22,8 @@ services:
       DB_PASS_ADMIN: ehrbase
       DB_USER: ehrbase_restricted
       DB_PASS: ehrbase_restricted
+      EHRBASE_AQL_EXPERIMENTAL_AQLONFOLDER_ENABLED: 'true'
     ports:
       - "8080:8080"
+volumes:
+  ehrbase_data:

@@ -1,0 +1,138 @@
+<div class="vital-signs-form">
+    <h2>Vital Signs</h2>
+    <form id="vitalsForm" onsubmit="handleSubmit(event)">
+        <div class="form-group">
+            <label for="pulse">Pulse Rate</label>
+            <div class="input-wrapper">
+                <input type="number" id="pulse" name="pulse" min="0" max="300">
+                <span class="unit">/min</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Blood Pressure</label>
+            <div class="bp-inputs">
+                <div class="input-wrapper">
+                    <input type="number" id="systolic" name="systolic" min="0" max="300">
+                    <span class="unit">mmHg</span>
+                </div>
+                <span class="separator">/</span>
+                <div class="input-wrapper">
+                    <input type="number" id="diastolic" name="diastolic" min="0" max="300">
+                    <span class="unit">mmHg</span>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit">Submit</button>
+    </form>
+</div>
+
+<script src="index.js"></script>
+<script>
+    async function handleSubmit(event) {
+        event.preventDefault();
+        
+        const heartRate = document.getElementById('pulse').value;
+        const systolic = document.getElementById('systolic').value;
+        const diastolic = document.getElementById('diastolic').value;
+        
+        const composition = dataToComposition(
+            heartRate ? parseInt(heartRate) : null,
+            systolic ? parseInt(systolic) : null,
+            diastolic ? parseInt(diastolic) : null
+        );
+        
+        console.log('Composition data:', composition);
+        const ehrId = '1bdea245-c51f-4522-a802-10b7af1d349a';
+        const templateId = 'vital_signs.v0';
+        const response = await fetch(`http://localhost:8080/ehrbase/rest/openehr/v1/ehr/${ehrId}/composition?templateId=${templateId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/openehr.wt.flat.schema+json',
+                'Accept': 'application/openehr.wt.flat.schema+json',
+                'Prefer': 'return=representation'
+            },
+            body: JSON.stringify(composition)
+        });
+        const body = await response.json();
+        console.log("Posted", body);
+    }
+</script>
+<style>
+    .vital-signs-form {
+        max-width: 400px;
+        margin: 20px auto;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+        color: #2c3e50;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+        color: #34495e;
+        font-weight: 500;
+    }
+
+    .input-wrapper {
+        display: inline-flex;
+        align-items: center;
+        background: white;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        padding: 4px 8px;
+    }
+
+    input {
+        border: none;
+        outline: none;
+        width: 80px;
+        padding: 4px;
+        font-size: 16px;
+    }
+
+    .unit {
+        color: #6c757d;
+        margin-left: 4px;
+        font-size: 14px;
+    }
+
+    .bp-inputs {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .separator {
+        font-size: 20px;
+        color: #6c757d;
+    }
+
+    button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        width: 100%;
+        font-size: 16px;
+        transition: background 0.2s;
+    }
+
+    button:hover {
+        background: #0056b3;
+    }
+</style>
